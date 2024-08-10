@@ -88,11 +88,29 @@ class Garden {
 int main() {
     Garden myGarden;
 
-    Plant rose("Rose", 12);
-    Plant tomato("Tomato", 8);
+    Plant plants[2] = {{"Rose",13},{"Tomato",8}};
 
-    myGarden.addPlant(rose);
-    myGarden.addPlant(tomato);
+    int len =  sizeof(plants)/sizeof(plants[0]);
+
+    for (int i = 0; i < len; i++) {
+        myGarden.addPlant(plants[i]);
+    }
+
+    cout << "Initial garden status:" << endl;
+    myGarden.showAllPlants();
+
+    cout << endl;
+
+    cout << "Growing all plants..." << endl;
+    myGarden.growAllPlants();
+
+
+    cout << "Watering all plants..." << endl;
+    cout << endl;
+    myGarden.waterAllPlants(50);
+
+    cout << "Updated garden status:" << endl;
+    myGarden.showAllPlants();
 
     return 0;
 }
