@@ -17,9 +17,9 @@ class Plant{
 
     public:
 
-        Plant(string plantName, int harvestAge){
-            name = plantName;
-            matureAge = harvestAge;
+        Plant(string name, int matureAge){
+            this->name = name;
+            this->matureAge = matureAge;
             maxWater = 100;
             waterLevel = 0;
             health = 0;
