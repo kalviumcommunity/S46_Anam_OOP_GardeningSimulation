@@ -60,25 +60,33 @@ class Plant{
 
 class Garden {
     private:
-        vector<Plant> plants;
+        vector<Plant*> plants;
 
     public:
-        void addPlant(const Plant& p){
+
+        ~Garden() {
+            for (auto plant : plants) {
+                delete plant; 
+            }
+        }
+
+        void addPlant(Plant* p){
             plants.push_back(p);
         }
         void waterAllPlants(int amount) {
-            for (auto& plant : plants) {
-                plant.water(amount);
+            for (auto plant : plants) {
+                plant->water(amount);
             }
         }
         void growAllPlants() {
-            for (auto& plant : plants) {
-                plant.grow();
+            for (auto plant : plants) {
+                plant->grow();
             }
         }
         void showAllPlants(){
-            for (auto& plant : plants) {
-                plant.status();
+            for (auto plant : plants) {
+                cout << "----------------" << endl;
+                plant->status();
                 cout << "----------------" << endl;
             }
         }
@@ -88,12 +96,12 @@ class Garden {
 int main() {
     Garden myGarden;
 
-    Plant plants[2] = {{"Rose",13},{"Tomato",8}};
+    Plant* plants = new Plant[2]{{"Rose", 13},{"Tomato", 8}};
 
-    int len =  sizeof(plants)/sizeof(plants[0]);
+    int len =  sizeof(&plants)/sizeof(&plants[0]);
 
     for (int i = 0; i < len; i++) {
-        myGarden.addPlant(plants[i]);
+        myGarden.addPlant(&plants[i]);
     }
 
     cout << "Initial garden status:" << endl;
