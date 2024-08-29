@@ -15,6 +15,9 @@ class Plant{
         int waterLevel;
         int time;
 
+    private:
+        static int totalPlants;
+
     public:
 
         Plant(string name, int matureAge){
@@ -25,6 +28,7 @@ class Plant{
             health = 0;
             age = 0;
             growthStage = "Seedling";
+            totalPlants++;
         }
         void grow(){
             if (growthStage == "Seedling") {
@@ -56,12 +60,17 @@ class Plant{
             cout << "Health: " << health << endl;
             cout << "Water Level: " << waterLevel << endl;
         }
+        static void showTotalPlants(){
+            cout << endl << "Total Plants: " << totalPlants << endl;
+        }
 };
+
+int Plant::totalPlants = 0;
 
 class Garden {
     private:
         vector<Plant*> plants;
-
+        static int attendedGarden;
     public:
 
         void addPlant(Plant* p){
@@ -71,6 +80,7 @@ class Garden {
             for (auto plant : plants) {
                 plant->water(amount);
             }
+            attendedGarden++;
         }
         void growAllPlants() {
             for (auto plant : plants) {
@@ -82,10 +92,15 @@ class Garden {
                 cout << "----------------" << endl;
                 plant->status();
                 cout << "----------------" << endl;
+                Plant::showTotalPlants();
             }
         }
+        static void showNoOfTimesAttended(){
+            cout << "Number of times Garden was attended: " << attendedGarden << endl;
+        };
 };
 
+int Garden::attendedGarden = 0;
 
 int main() {
 
@@ -123,6 +138,8 @@ int main() {
 
     cout << endl << "Updated garden status:" << endl;
     myGarden->showAllPlants();
+
+    Garden::showNoOfTimesAttended();
 
     for (int i = 0; i < numPlants; i++) {
         delete plants[i];
