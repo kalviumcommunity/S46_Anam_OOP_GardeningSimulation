@@ -64,12 +64,6 @@ class Garden {
 
     public:
 
-        ~Garden() {
-            for (auto plant : plants) {
-                delete plant; 
-            }
-        }
-
         void addPlant(Plant* p){
             plants.push_back(p);
         }
@@ -94,31 +88,48 @@ class Garden {
 
 
 int main() {
-    Garden myGarden;
 
-    Plant* plants = new Plant[2]{{"Rose", 13},{"Tomato", 8}};
+    int numPlants;
+    cout << "Enter the number of plants you want to create: ";
+    cin >> numPlants;
 
-    int len =  sizeof(&plants)/sizeof(&plants[0]);
+    Plant** plants = new Plant*[numPlants];
 
-    for (int i = 0; i < len; i++) {
-        myGarden.addPlant(&plants[i]);
+    for (int i = 0; i < numPlants; i++) {
+        string plantName;
+        int matureAge;
+        cout << "Enter name for plant " << i + 1 << ": ";
+        cin >> plantName;
+        cout << "Enter mature age for plant " << i + 1 << ": ";
+        cin >> matureAge;
+
+        plants[i] = new Plant(plantName, matureAge);
+    }
+
+    Garden* myGarden = new Garden();
+
+    for (int i = 0; i < numPlants; i++) {
+        myGarden->addPlant(plants[i]);
     }
 
     cout << "Initial garden status:" << endl;
-    myGarden.showAllPlants();
+    myGarden->showAllPlants();
 
-    cout << endl;
-
-    cout << "Growing all plants..." << endl;
-    myGarden.growAllPlants();
-
+    cout << endl << "Growing all plants..." << endl;
+    myGarden->growAllPlants();
 
     cout << "Watering all plants..." << endl;
-    cout << endl;
-    myGarden.waterAllPlants(50);
+    myGarden->waterAllPlants(50);
 
-    cout << "Updated garden status:" << endl;
-    myGarden.showAllPlants();
+    cout << endl << "Updated garden status:" << endl;
+    myGarden->showAllPlants();
+
+    for (int i = 0; i < numPlants; i++) {
+        delete plants[i];
+    }
+    delete[] plants;
+
+    delete myGarden;
 
     return 0;
 }
