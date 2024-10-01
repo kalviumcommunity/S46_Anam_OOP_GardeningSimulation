@@ -20,6 +20,11 @@ class Plant{
 
     public:
 
+        ~Plant(){
+            totalPlants--;
+            cout << "A plant was destroyed" << endl;
+        }
+
         Plant(string name, int matureAge){
             this->name = name;
             this->matureAge = matureAge;
@@ -94,6 +99,10 @@ class Garden {
         vector<Plant*> plants;
         static int attendedGarden;
     public:
+        ~Garden(){
+            attendedGarden--;
+            cout << "A Garden was destroyed" << endl;
+        }
         static int getAttendedGarden() {
             return attendedGarden;
         }
