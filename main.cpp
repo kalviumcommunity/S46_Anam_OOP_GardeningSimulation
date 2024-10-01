@@ -30,6 +30,28 @@ class Plant{
             growthStage = "Seedling";
             totalPlants++;
         }
+        string getName(){
+            return name;
+        }
+        void setName(string newName){
+            name = newName;
+        }
+        int getWaterLevel(){
+            return waterLevel;
+        }
+        int getAge(){
+            return age;
+        }
+        void setWaterLevel(int amount) {
+            waterLevel = min(maxWater, waterLevel+amount);
+        }
+        void updateAge(double age){
+            this->age += age;
+        }
+        void updateTime(int time){
+            this->time = time;
+        }
+
         void grow(){
             if (growthStage == "Seedling") {
                 if (time >= matureAge / 2) {
@@ -47,18 +69,18 @@ class Plant{
             } else {
                 health += 10;
             }
-            age += 0.5;
-            time += 1;
+            updateAge(0.5);
+            updateTime(1);
         }
         void water(int amount){
-            waterLevel = min(maxWater, waterLevel + amount);
+            setWaterLevel(amount);
         }
         void status(){
-            cout << "Plant: " << name << endl;
+            cout << "Plant: " << getName() << endl;
             cout << "Growth Stage: " << growthStage << endl;
-            cout << "Age: " << age << endl;
+            cout << "Age: " << getAge() << endl;
             cout << "Health: " << health << endl;
-            cout << "Water Level: " << waterLevel << endl;
+            cout << "Water Level: " << getWaterLevel() << endl;
         }
         static void showTotalPlants(){
             cout << endl << "Total Plants: " << totalPlants << endl;
@@ -72,7 +94,12 @@ class Garden {
         vector<Plant*> plants;
         static int attendedGarden;
     public:
-
+        static int getAttendedGarden() {
+            return attendedGarden;
+        }
+        static void setAttendedGarden(int times) {
+            attendedGarden = times;
+        }
         void addPlant(Plant* p){
             plants.push_back(p);
         }
@@ -96,7 +123,7 @@ class Garden {
             }
         }
         static void showNoOfTimesAttended(){
-            cout << "Number of times Garden was attended: " << attendedGarden << endl;
+            cout << "Number of times Garden was attended: " << Garden::getAttendedGarden() << endl;
         };
 };
 
