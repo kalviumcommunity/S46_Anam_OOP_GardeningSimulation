@@ -1,137 +1,185 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
-class Plant{
+// Base Class: Plant
+class Plant {
+protected:
+    string name;
+    string growthStage;
+    double age;
+    int health;
+    int matureAge;
+    int maxWater;
+    int waterLevel;
+    
+private:
+    static int totalPlants;
 
-    protected:
-        string name;
-        string growthStage;
-        double age;
-        int health;
-        int matureAge;
-        int maxWater;
-        int waterLevel;
-        int time;
+public:
+    Plant(string name, int matureAge) {
+        this->name = name;
+        this->matureAge = matureAge;
+        maxWater = 100;
+        waterLevel = 0;
+        health = 0;
+        age = 0;
+        growthStage = "Seedling";
+        totalPlants++;
+    }
 
-    private:
-        static int totalPlants;
+    virtual ~Plant() {} // Virtual destructor for proper cleanup of derived classes.
 
-    public:
+    virtual void grow() {
+        if (growthStage == "Seedling" && age >= matureAge / 2) {
+            growthStage = "Growing";
+            health += 20;
+        } else if (growthStage == "Growing" && age <= matureAge) {
+            growthStage = "Mature";
+            health += 15;
+        }
+        if (age > matureAge) {
+            health -= 5;
+        } else {
+            health += 10;
+        }
+        age += 2;
+    }
 
-        Plant(string name, int matureAge){
-            this->name = name;
-            this->matureAge = matureAge;
-            maxWater = 100;
-            waterLevel = 0;
-            health = 0;
-            age = 0;
-            growthStage = "Seedling";
-            totalPlants++;
-        }
-        string getName(){
-            return name;
-        }
-        void setName(string newName){
-            name = newName;
-        }
-        int getWaterLevel(){
-            return waterLevel;
-        }
-        int getAge(){
-            return age;
-        }
-        void setWaterLevel(int amount) {
-            waterLevel = min(maxWater, waterLevel+amount);
-        }
-        void updateAge(double age){
-            this->age += age;
-        }
-        void updateTime(int time){
-            this->time = time;
-        }
+    virtual void status() {
+        cout << "Plant: " << name << endl;
+        cout << "Growth Stage: " << growthStage << endl;
+        cout << "Age: " << age << endl;
+        cout << "Health: " << health << endl;
+        cout << "Water Level: " << waterLevel << endl;
+    }
 
-        void grow(){
-            if (growthStage == "Seedling") {
-                if (time >= matureAge / 2) {
-                    growthStage = "Growing";
-                    health += 20;
-                }
-            } else if (growthStage == "Growing") {
-                if (age >= matureAge) {
-                    growthStage = "Mature";
-                    health += 15;
-                }
-            }
-            if (age > matureAge) {
-                health -= 5;
-            } else {
-                health += 10;
-            }
-            updateAge(0.5);
-            updateTime(1);
-        }
-        void water(int amount){
-            setWaterLevel(amount);
-        }
-        void status(){
-            cout << "Plant: " << getName() << endl;
-            cout << "Growth Stage: " << growthStage << endl;
-            cout << "Age: " << getAge() << endl;
-            cout << "Health: " << health << endl;
-            cout << "Water Level: " << getWaterLevel() << endl;
-        }
-        static void showTotalPlants(){
-            cout << endl << "Total Plants: " << totalPlants << endl;
-        }
+    void water(int amount) {
+        waterLevel = min(maxWater, waterLevel + amount);
+    }
+
+    static void showTotalPlants() {
+        cout << "Total Plants: " << totalPlants << endl;
+    }
 };
 
 int Plant::totalPlants = 0;
 
+// Derived Class (Single Inheritance): FloweringPlant
+class FloweringPlant : public Plant {
+private:
+    int flowerCount;
+
+public:
+    FloweringPlant(string name, int matureAge) : Plant(name, matureAge) {
+        flowerCount = 0;
+    }
+
+    void grow() override {
+        Plant::grow();
+        if (growthStage == "Mature") {
+            flowerCount += 5; // Flowering plants produce flowers when mature.
+        }
+    }
+
+    void status() override {
+        Plant::status();
+        cout << "Flower Count: " << flowerCount << endl;
+    }
+};
+
+// Derived Class (Multilevel Inheritance): FruitPlant -> AppleTree
+class FruitPlant : public Plant {
+protected:
+    int fruitCount;
+
+public:
+    FruitPlant(string name, int matureAge) : Plant(name, matureAge) {
+        fruitCount = 0;
+    }
+
+    void grow() override {
+        Plant::grow();
+        if (growthStage == "Mature") {
+            fruitCount += 3; // Fruit plants produce fruits when mature.
+        }
+    }
+
+    void status() override {
+        Plant::status();
+        cout << "Fruit Count: " << fruitCount << endl;
+    }
+};
+
+// Further Derived Class: AppleTree
+class HighYieldFruit : public FruitPlant {
+public:
+    HighYieldFruit(string name, int matureAge) : FruitPlant(name, matureAge) {}
+
+    void grow() override {
+        FruitPlant::grow();
+        if (growthStage == "Mature") {
+            fruitCount += 10;
+        }
+    }
+};
+
+// Garden class remains unchanged
 class Garden {
-    private:
-        vector<Plant*> plants;
-        static int attendedGarden;
-    public:
-        static int getAttendedGarden() {
-            return attendedGarden;
+private:
+    vector<Plant*> plants;
+    static int attendedGarden;
+
+public:
+    static int getAttendedGarden() {
+        return attendedGarden;
+    }
+    static void setAttendedGarden(int times) {
+        attendedGarden = times;
+    }
+
+    void addPlant(Plant* p) {
+        plants.push_back(p);
+    }
+
+    void waterAllPlants(int amount) {
+        for (auto plant : plants) {
+            plant->water(amount);
         }
-        static void setAttendedGarden(int times) {
-            attendedGarden = times;
+        attendedGarden++;
+    }
+
+    void growAllPlants() {
+        for (auto plant : plants) {
+            plant->grow();
         }
-        void addPlant(Plant* p){
-            plants.push_back(p);
+    }
+
+    void showAllPlants() {
+        for (auto plant : plants) {
+            cout << "----------------" << endl;
+            plant->status();
+            cout << "----------------" << endl;
         }
-        void waterAllPlants(int amount) {
-            for (auto plant : plants) {
-                plant->water(amount);
-            }
-            attendedGarden++;
-        }
-        void growAllPlants() {
-            for (auto plant : plants) {
-                plant->grow();
-            }
-        }
-        void showAllPlants(){
-            for (auto plant : plants) {
-                cout << "----------------" << endl;
-                plant->status();
-                cout << "----------------" << endl;
-                Plant::showTotalPlants();
-            }
-        }
-        static void showNoOfTimesAttended(){
-            cout << "Number of times Garden was attended: " << Garden::getAttendedGarden() << endl;
-        };
+        Plant::showTotalPlants();
+    }
+
+    static void showNoOfTimesAttended() {
+        cout << "Number of times Garden was attended: " << getAttendedGarden() << endl;
+    }
 };
 
 int Garden::attendedGarden = 0;
 
 int main() {
-
     int numPlants;
+    vector<string> fruits = {
+        "blackberry", "raspberry", "strawberry",
+        "blueberry", "tomato", "apple",
+        "mango", "jackfruit", "fig"
+    };
     cout << "Enter the number of plants you want to create: ";
     cin >> numPlants;
 
@@ -140,12 +188,26 @@ int main() {
     for (int i = 0; i < numPlants; i++) {
         string plantName;
         int matureAge;
+        string type;
         cout << "Enter name for plant " << i + 1 << ": ";
         cin >> plantName;
         cout << "Enter mature age for plant " << i + 1 << ": ";
         cin >> matureAge;
+        cout << "Enter type of plant (flowering, fruit, vegetable): ";
+        cin >> type;
 
-        plants[i] = new Plant(plantName, matureAge);
+        if (type == "flowering") {
+            plants[i] = new FloweringPlant(plantName, matureAge);
+        } else if (type == "fruit") {
+            auto it = find(fruits.begin(), fruits.end(), type);
+            if (it != fruits.end()) {
+                plants[i] = new HighYieldFruit(plantName, matureAge);
+            } else {
+                plants[i] = new FruitPlant(plantName, matureAge);
+            }
+        }else {
+            plants[i] = new Plant(plantName, matureAge);
+        }
     }
 
     Garden* myGarden = new Garden();
@@ -158,6 +220,8 @@ int main() {
     myGarden->showAllPlants();
 
     cout << endl << "Growing all plants..." << endl;
+    myGarden->growAllPlants();
+    myGarden->growAllPlants();
     myGarden->growAllPlants();
 
     cout << "Watering all plants..." << endl;
