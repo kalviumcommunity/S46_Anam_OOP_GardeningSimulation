@@ -14,8 +14,7 @@ protected:
     int matureAge;
     int maxWater;
     int waterLevel;
-    int time;
-
+    
 private:
     static int totalPlants;
 
@@ -34,10 +33,10 @@ public:
     virtual ~Plant() {} // Virtual destructor for proper cleanup of derived classes.
 
     virtual void grow() {
-        if (growthStage == "Seedling" && time >= matureAge / 2) {
+        if (growthStage == "Seedling" && age >= matureAge / 2) {
             growthStage = "Growing";
             health += 20;
-        } else if (growthStage == "Growing" && age >= matureAge) {
+        } else if (growthStage == "Growing" && age <= matureAge) {
             growthStage = "Mature";
             health += 15;
         }
@@ -46,8 +45,7 @@ public:
         } else {
             health += 10;
         }
-        age += 0.5;
-        time++;
+        age += 2;
     }
 
     virtual void status() {
@@ -222,6 +220,8 @@ int main() {
     myGarden->showAllPlants();
 
     cout << endl << "Growing all plants..." << endl;
+    myGarden->growAllPlants();
+    myGarden->growAllPlants();
     myGarden->growAllPlants();
 
     cout << "Watering all plants..." << endl;
