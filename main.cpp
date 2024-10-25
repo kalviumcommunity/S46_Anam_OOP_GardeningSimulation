@@ -4,129 +4,156 @@
 #include <algorithm>
 using namespace std;
 
-// Base Class: Plant
+// Abstract Base Class: Plant
 class Plant {
-protected:
-    string name;
-    string growthStage;
-    double age;
-    int health;
-    int matureAge;
-    int maxWater;
-    int waterLevel;
-    
-private:
-    static int totalPlants;
 
-public:
-    Plant(string name, int matureAge) {
-        this->name = name;
-        this->matureAge = matureAge;
-        maxWater = 100;
-        waterLevel = 0;
-        health = 0;
-        age = 0;
-        growthStage = "Seedling";
-        totalPlants++;
-    }
+    protected:
+        string name;
+        string growthStage;
+        double age;
+        int health;
+        int matureAge;
+        int maxWater;
+        int waterLevel;
+        
+    private:
+        static int totalPlants;
 
-    virtual ~Plant() {} // Virtual destructor for proper cleanup of derived classes.
-
-    virtual void grow() {
-        if (growthStage == "Seedling" && age >= matureAge / 2) {
-            growthStage = "Growing";
-            health += 20;
-        } else if (growthStage == "Growing" && age <= matureAge) {
-            growthStage = "Mature";
-            health += 15;
+    public:
+        Plant(string name, int matureAge) {
+            this->name = name;
+            this->matureAge = matureAge;
+            maxWater = 100;
+            waterLevel = 0;
+            health = 0;
+            age = 0;
+            growthStage = "Seedling";
+            totalPlants++;
         }
-        if (age > matureAge) {
-            health -= 5;
-        } else {
-            health += 10;
+
+        virtual ~Plant() {} 
+
+        // Pure virtual function
+        virtual void growSpecialization() = 0;
+
+        void grow() {
+            if (growthStage == "Seedling" && age >= matureAge / 2) {
+                growthStage = "Growing";
+                health += 20;
+            } else if (growthStage == "Growing" && age <= matureAge) {
+                growthStage = "Mature";
+                health += 15;
+            }
+            if (age > matureAge) {
+                health -= 5;
+            } else {
+                health += 10;
+            }
+            age += 2;
+
+            growSpecialization();
         }
-        age += 2;
-    }
 
-    virtual void status() {
-        cout << "Plant: " << name << endl;
-        cout << "Growth Stage: " << growthStage << endl;
-        cout << "Age: " << age << endl;
-        cout << "Health: " << health << endl;
-        cout << "Water Level: " << waterLevel << endl;
-    }
+        virtual void status() {
+            cout << "Plant: " << name << endl;
+            cout << "Growth Stage: " << growthStage << endl;
+            cout << "Age: " << age << endl;
+            cout << "Health: " << health << endl;
+            cout << "Water Level: " << waterLevel << endl;
+        }
 
-    void water(int amount) {
-        waterLevel = min(maxWater, waterLevel + amount);
-    }
+        void water(int amount) {
+            waterLevel = min(maxWater, waterLevel + amount);
+        }
 
-    static void showTotalPlants() {
-        cout << "Total Plants: " << totalPlants << endl;
-    }
+        static void showTotalPlants() {
+            cout << "Total Plants: " << totalPlants << endl;
+        }
 };
 
 int Plant::totalPlants = 0;
 
-// Derived Class (Single Inheritance): FloweringPlant
+// Derived Class: FloweringPlant
 class FloweringPlant : public Plant {
-private:
-    int flowerCount;
 
-public:
-    FloweringPlant(string name, int matureAge) : Plant(name, matureAge) {
-        flowerCount = 0;
-    }
+    private:
+        int flowerCount;
 
-    void grow() override {
-        Plant::grow();
-        if (growthStage == "Mature") {
-            flowerCount += 5; // Flowering plants produce flowers when mature.
+    public:
+        FloweringPlant(string name, int matureAge) : Plant(name, matureAge) {
+            flowerCount = 0;
         }
-    }
 
-    void status() override {
-        Plant::status();
-        cout << "Flower Count: " << flowerCount << endl;
-    }
+        void growSpecialization() override {
+            if (growthStage == "Mature") {
+                flowerCount += 5; // Flowering plants produce flowers when mature.
+            }
+        }
+
+        void status() override {
+            Plant::status();
+            cout << "Flower Count: " << flowerCount << endl;
+        }
 };
 
-// Derived Class (Multilevel Inheritance): FruitPlant -> AppleTree
+// Derived Class: FruitPlant
 class FruitPlant : public Plant {
-protected:
-    int fruitCount;
 
-public:
-    FruitPlant(string name, int matureAge) : Plant(name, matureAge) {
-        fruitCount = 0;
-    }
+    protected:
+        int fruitCount;
 
-    void grow() override {
-        Plant::grow();
-        if (growthStage == "Mature") {
-            fruitCount += 3; // Fruit plants produce fruits when mature.
+    public:
+        FruitPlant(string name, int matureAge) : Plant(name, matureAge) {
+            fruitCount = 0;
         }
-    }
 
-    void status() override {
-        Plant::status();
-        cout << "Fruit Count: " << fruitCount << endl;
-    }
+        void growSpecialization() override {
+            if (growthStage == "Mature") {
+                fruitCount += 3; // Fruit plants produce fruits when mature.
+            }
+        }
+
+        void status() override {
+            Plant::status();
+            cout << "Fruit Count: " << fruitCount << endl;
+        }
 };
 
-// Further Derived Class: AppleTree
+class Vegatable : public Plant {
+
+    protected:
+        int vegetableCount;
+
+    public:
+        Vegatable(string name, int matureAge) : Plant(name, matureAge){
+            vegetableCount = 0;
+        }
+
+        void growSpecialization() override{
+            if (growthStage == "Mature") {
+                vegetableCount += 3; // Vegetable plants produce vegetables when mature.
+            }
+        }
+
+        void status() override{
+            Plant::status();
+            cout << "Vegetable Count: " << vegetableCount << endl;
+        }
+};
+
+// Further Derived Class: HighYieldFruit
 class HighYieldFruit : public FruitPlant {
 public:
     HighYieldFruit(string name, int matureAge) : FruitPlant(name, matureAge) {}
 
-    void grow() override {
-        FruitPlant::grow();
+    void growSpecialization() override {
+        FruitPlant::growSpecialization();
         if (growthStage == "Mature") {
-            fruitCount += 10;
+            fruitCount += 10; // Additional yield for high-yield fruits.
         }
     }
 };
 
-// Garden class remains unchanged
 class Garden {
 private:
     vector<Plant*> plants;
@@ -199,14 +226,14 @@ int main() {
         if (type == "flowering") {
             plants[i] = new FloweringPlant(plantName, matureAge);
         } else if (type == "fruit") {
-            auto it = find(fruits.begin(), fruits.end(), type);
+            auto it = find(fruits.begin(), fruits.end(), plantName);
             if (it != fruits.end()) {
                 plants[i] = new HighYieldFruit(plantName, matureAge);
             } else {
                 plants[i] = new FruitPlant(plantName, matureAge);
             }
         }else {
-            plants[i] = new Plant(plantName, matureAge);
+            plants[i] = new Vegatable(plantName, matureAge);
         }
     }
 
